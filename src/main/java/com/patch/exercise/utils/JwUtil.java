@@ -1,14 +1,17 @@
 package com.patch.exercise.utils;
 
-import io.jsonwebtoken.Jwt;
-import io.jsonwebtoken.JwtParser;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import com.patch.exercise.service.AutenticacaoSerivce;
+import io.jsonwebtoken.*;
+import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
 public class JwUtil {
+
+
     public String gerarToken(UserDetails userDetails){
         return Jwts.builder().issuer("WEG")
                 .issuedAt(new Date())
@@ -19,13 +22,12 @@ public class JwUtil {
 
     }
 
-    public void validarToken(String token){
-        var parse = Jwts.parser().setSigningKey("senha123").build();
-        parse.parseSignedClaims(token);
+    private Jws<Claims> validarToken(String token){
+        return getParser().parseSignedClaims(token);
     }
 
     public String getUsername(String token){
-        return getParser().parseSignedClaims(token).getPayload().
+        return validarToken(token).getPayload().getSubject();
     }
 
     private JwtParser getParser(){
